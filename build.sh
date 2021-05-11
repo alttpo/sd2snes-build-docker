@@ -3,6 +3,14 @@
 # stop on first error:
 set -e
 
+# clone sd2snes repo into sd2snes/ if that directory does not already exist:
+if [ ! -d "sd2snes" ]; then
+  echo Cloning sd2snes repository into sd2snes/
+  git clone https://github.com/mrehkopf/sd2snes.git
+else
+  echo Existing working copy of sd2snes/ found.
+fi
+
 # build the docker image which compiles the sd2snes firmware:
 echo Building docker image which compiles the sd2snes firmware
 docker build . -t sd2snes

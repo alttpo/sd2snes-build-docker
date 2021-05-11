@@ -7,7 +7,8 @@ RUN curl https://getmic.ro | bash
 RUN cp /work/micro /usr/local/bin/
 
 # clone develop from sd2snes firmware repo:
-RUN git clone --depth 1 https://github.com/mrehkopf/sd2snes.git
+#RUN git clone --depth 1 https://github.com/mrehkopf/sd2snes.git
+ADD ./sd2snes /work/sd2snes
 
 WORKDIR /work/sd2snes
 
