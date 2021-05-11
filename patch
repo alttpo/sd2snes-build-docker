@@ -1,0 +1,57 @@
+diff --git a/src/savestate.c b/src/savestate.c
+index 549dd68..146d08d 100644
+--- a/src/savestate.c
++++ b/src/savestate.c
+@@ -136,22 +136,24 @@ void savestate_set_fixes() {
+ void load_backup_state() {
+   uint8_t slot = CFG.enable_savestate_slots ? sram_readbyte(SS_SLOTS_ADDR) : 1;
+   char line[256] = SS_BASEDIR;
++  char line2[256];
+   check_or_create_folder(SS_BASEDIR);
+   cfg_get_last_game(file_lfn, 0);
+   append_file_basename(line, (char*)file_lfn, "%02d.state", sizeof(line));
+-  snprintf(line, 256, line, slot);
++  snprintf(line2, 256, line, slot);
+
+-  load_sram((uint8_t*) line, 0xF00000L);
++  load_sram((uint8_t*) line2, 0xF00000L);
+   file_res = FR_OK;
+ }
+
+ void save_backup_state() {
+   uint8_t slot = CFG.enable_savestate_slots ? sram_readbyte(SS_SLOTS_ADDR) : 1;
+   char line[256] = SS_BASEDIR;
++  char line2[256];
+   check_or_create_folder(SS_BASEDIR);
+   cfg_get_last_game(file_lfn, 0);
+   append_file_basename(line, (char*)file_lfn, "%02d.state", sizeof(line));
+-  snprintf(line, 256, line, slot);
++  snprintf(line2, 256, line, slot);
+
+-  save_sram((uint8_t*) line, 0x50000L, 0xF00000L);
+-}
+\ No newline at end of file
++  save_sram((uint8_t*) line2, 0x50000L, 0xF00000L);
++}
+diff --git a/src/usbhw.c b/src/usbhw.c
+index 71e6462..9d26969 100644
+--- a/src/usbhw.c
++++ b/src/usbhw.c
+@@ -450,7 +450,7 @@ uint32_t USB_ReadEP (uint32_t EPNum, uint8_t *pData) {
+   cnt &= PKT_LNGTH_MASK;
+
+   for (n = 0; n < (cnt + 3) / 4; n++) {
+-    *((__packed uint32_t *)pData) = LPC_USB->USBRxData;
++    *(( /*__packed*/ uint32_t *)pData) = LPC_USB->USBRxData;
+     pData += 4;
+   }
+   LPC_USB->USBCtrl = 0;
+@@ -481,7 +481,7 @@ uint32_t USB_WriteEP (uint32_t EPNum, uint8_t *pData, uint32_t cnt) {
+   LPC_USB->USBTxPLen = cnt;
+
+   for (n = 0; n < (cnt + 3) / 4; n++) {
+-    LPC_USB->USBTxData = *((__packed uint32_t *)pData);
++    LPC_USB->USBTxData = *(( /*__packed*/ uint32_t *)pData);
+     pData += 4;
+   }
+   LPC_USB->USBCtrl = 0;
