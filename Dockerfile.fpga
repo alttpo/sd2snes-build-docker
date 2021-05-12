@@ -1,0 +1,26 @@
+# use a recent ARM compiler
+FROM stronglytyped/arm-none-eabi-gcc:latest
+
+WORKDIR /work/quartus
+RUN wget https://download.altera.com/akdlm/software/acdsinst/20.1std.1/720/ib_tar/Quartus-lite-20.1.1.720-linux.tar
+RUN tar xf Quartus-lite-20.1.1.720-linux.tar
+
+RUN ./setup.sh --mode unattended --accept_eula 1 --installdir /work/intelFPGA_lite/20.1 --disable-components quartus_help,modelsim_ase,modelsim_ae,cyclone10lp,cyclonev,max,max10,arria_lite
+
+# available components: discover with `./setup.sh --help`
+# quartus quartus_help devinfo arria_lite cyclone cyclone10lp cyclonev max max10 quartus_update modelsim_ase modelsim_ae
+
+# install necessary build tools:
+WORKDIR /work
+RUN apt-get update && apt-get install -y gawk unzip curl
+RUN curl https://getmic.ro | bash
+RUN cp /work/micro /usr/local/bin/
+
+# clone develop from sd2snes firmware repo:
+#RUN git clone --depth 1 https://github.com/mrehkopf/sd2snes.git
+ADD ./sd2snes /work/sd2snes
+
+WORKDIR /work/sd2snes
+
+#RUN cd ./utils && make
+#RUN cd ./src/utils && make
