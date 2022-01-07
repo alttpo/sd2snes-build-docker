@@ -12,15 +12,17 @@ else
 fi
 
 # build the docker image which compiles the sd2snes firmware:
-echo Building docker image which compiles the sd2snes firmware
-docker build . -t sd2snes
+echo Building docker image which compiles the sd2snes firmware and FPGA
+docker build . -t sd2snes-fpga
 
-# create the container from the image to extract the firmware.im3 build result:
-echo Creating docker container from the built image to extract firmware.im3
-container_id=$(docker create sd2snes)
-echo Extracting firmware.im3
+# create the container from the image to extract the im3 build results:
+echo Creating docker container from the built image to extract im3 files
+container_id=$(docker create sd2snes-fpga)
+echo Extracting im3 files
 docker cp ${container_id}:/work/sd2snes/src/obj-mk3/firmware.im3 .
+docker cp ${container_id}:/work/sd2snes/verilog/sd2snes_base/fpga_base.bi3 .
+docker cp ${container_id}:/work/sd2snes/verilog/sd2snes_mini/fpga_mini.bi3 .
 echo Removing temporary container
 docker rm ${container_id}
 
-echo Successfully built firmware.im3
+echo Successfully built firmware and FPGA images for MK3
