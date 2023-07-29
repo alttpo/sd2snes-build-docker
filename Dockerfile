@@ -2,14 +2,23 @@
 FROM stronglytyped/arm-none-eabi-gcc:latest AS install
 
 WORKDIR /work/quartus
-RUN wget https://download.altera.com/akdlm/software/acdsinst/20.1std.1/720/ib_tar/Quartus-lite-20.1.1.720-linux.tar
-RUN tar xf Quartus-lite-20.1.1.720-linux.tar && \
-	./setup.sh --mode unattended --accept_eula 1 --installdir /opt/intelFPGA_lite/20.1 --disable-components quartus_help,modelsim_ase,modelsim_ae,cyclone10lp,cyclonev,max,max10,arria_lite && \
+
+# version 20.1
+#RUN wget https://download.altera.com/akdlm/software/acdsinst/20.1std.1/720/ib_tar/Quartus-lite-20.1.1.720-linux.tar
+#RUN tar xf Quartus-lite-20.1.1.720-linux.tar && \
+#	./setup.sh --mode unattended --accept_eula 1 --installdir /opt/intelFPGA_lite/20.1 --disable-components quartus_help,modelsim_ase,modelsim_ae,cyclone10lp,cyclonev,max,max10,arria_lite && \
+#	rm -fr *
+
+# version 22.1
+RUN wget https://downloads.intel.com/akdlm/software/acdsinst/22.1std.1/917/ib_tar/Quartus-lite-22.1std.1.917-linux.tar
+RUN tar xf Quartus-lite-22.1std.1.917-linux.tar && \
+	./setup.sh --mode unattended --accept_eula 1 --installdir /opt/intelFPGA_lite/22.1 --disable-components quartus_help,cyclone10lp,cyclonev,max,max10,arria_lite && \
 	rm -fr *
 
 ######################################################
 
 FROM stronglytyped/arm-none-eabi-gcc:latest
+VOLUME /work/sd2snes
 
 COPY --from=install /opt /opt
 
@@ -21,15 +30,15 @@ WORKDIR /work
 RUN apt update && apt install -y gawk unzip curl libglib2.0-0 libtcmalloc-minimal4
 RUN curl https://getmic.ro | bash ; cp micro /usr/local/bin/
 
-# LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libtcmalloc_minimal.so.4 LD_LIBRARY_PATH=/opt/intelFPGA_lite/20.1/quartus/linux64
-RUN mv /opt/intelFPGA_lite/20.1/quartus/linux64/libboost_system.so /opt/intelFPGA_lite/20.1/quartus/linux64/libboost_system.so.disabled ; \
-	mv /opt/intelFPGA_lite/20.1/quartus/linux64/libccl_curl_drl.so /opt/intelFPGA_lite/20.1/quartus/linux64/libccl_curl_drl.so.disabled ; \
-	mv /opt/intelFPGA_lite/20.1/quartus/linux64/libstdc++.so.6 /opt/intelFPGA_lite/20.1/quartus/linux64/libstdc++.so.6.disabled ; \
-	mv /opt/intelFPGA_lite/20.1/quartus/linux64/libstdc++.so /opt/intelFPGA_lite/20.1/quartus/linux64/libstdc++.so.disabled
+# LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libtcmalloc_minimal.so.4 LD_LIBRARY_PATH=/opt/intelFPGA_lite/22.1/quartus/linux64
+RUN mv /opt/intelFPGA_lite/22.1/quartus/linux64/libboost_system.so /opt/intelFPGA_lite/22.1/quartus/linux64/libboost_system.so.disabled ; \
+	mv /opt/intelFPGA_lite/22.1/quartus/linux64/libccl_curl_drl.so /opt/intelFPGA_lite/22.1/quartus/linux64/libccl_curl_drl.so.disabled ; \
+	mv /opt/intelFPGA_lite/22.1/quartus/linux64/libstdc++.so.6 /opt/intelFPGA_lite/22.1/quartus/linux64/libstdc++.so.6.disabled ; \
+	mv /opt/intelFPGA_lite/22.1/quartus/linux64/libstdc++.so /opt/intelFPGA_lite/22.1/quartus/linux64/libstdc++.so.disabled
 
 # clone develop from sd2snes firmware repo:
-#RUN git clone --depth 1 https://github.com/mrehkopf/sd2snes.git
-ADD ./sd2snes /work/sd2snes
+RUN git clone --depth 1 https://github.com/mrehkopf/sd2snes.git
+#ADD ./sd2snes /work/sd2snes
 
 WORKDIR /work/sd2snes
 
